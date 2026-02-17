@@ -22,19 +22,34 @@
 
 module motor_fault_logic (
     input clk,
-    input [15:0] current_in, // Input from your text file data
-    input [15:0] speed_in,   // Input from your text file data
+    input rst,                 // <-- ADD RESET
+    input [15:0] current_in,
+    input [15:0] speed_in,     // (not used yet)
     output reg fault_detected
 ); 
 
-    // Healthy steady state = 1980
-    // Faulty steady state  = 3500
-    // Threshold set to 3000 (0.3A scaled)
-    
+    parameter CURRENT_THRESHOLD = 16'd3000;
+    parameter STABILITY_COUNT   = 5;
+
+    reg [3:0] counter;  // enough for count up to 15
+
     always @(posedge clk) begin
-        if (current_in > 3000) 
-            fault_detected <= 1'b1;
-        else
-            fault_detected <= 1'b0;
+        if (rst) begin
+            counter <= 0;
+            fault_detected <= 0;
+        end
+        else begin
+            if (current_in > CURRENT_THRESHOLD)
+                counter <= counter + 1;
+            else
+                counter <= 0;
+
+            if (counter >= STABILITY_COUNT)
+                fault_detected <= 1'b1;
+            else
+                fault_detected <= 1'b0;
+        end
     end
+
 endmodule
+
