@@ -11,7 +11,7 @@ module tb_top();
     // 2. Unit Under Test (UUT)
     motor_fault_logic uut (
         .clk(clk),
-        // .rst(rst), // Uncomment this if your module has a reset pin
+        .rst(rst),   // CONNECT RESET
         .current_in(current_data),
         .speed_in(speed_data),
         .fault_detected(fault)
